@@ -1,7 +1,10 @@
 {
   "orgName": "ahb winner",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "hasSampleData": false,
+  "features": [
+    "EnableSetPasswordInApi"
+  ],
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
