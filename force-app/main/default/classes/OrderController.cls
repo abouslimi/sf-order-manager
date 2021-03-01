@@ -17,18 +17,19 @@ public with sharing class OrderController {
     public static Boolean activateOrder(Id orderId) {
         try {
             HttpResponse res = OrderRepository.activateOrderInExternalSystem(orderId);
-            if (res.getStatusCode() != 200) {
-                System.debug('Callout failed: ' + res);
-                return false;
-            } else {
-                Order order = new Order(Id=orderId, Status='Activated');
-                update order;
-                return true;
+            if (res != null && res.getStatusCode() == 200) {
+                try {
+                    Order order = new Order(Id=orderId, Status='Activated');
+                    update order;
+                    return true;
+                } catch (DmlException e) {
+                    System.debug(e);
+                }
             }
         } catch (Exception e) {
             System.debug('Exception: ' + e);
-            return false;
         }
+        return false;
     }
 
     public static OrderItem createOrderItem(Id orderId, Id pricebookEntryId, Id productId, Decimal unitPrice, Decimal quantity) {
