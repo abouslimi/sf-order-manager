@@ -12,7 +12,7 @@ public with sharing class AvailableProductsController {
      * @return List of Pricebook Entries
      */
     @AuraEnabled(Cacheable=true)
-    public static List<PricebookEntryWrapper> getPricebookEntriesByOrderId(Id orderId) {
+    public static Object getPricebookEntriesByOrderId(Id orderId) {
         List<PricebookEntry> pricebookEntries = PricebookController.getPricebookEntriesByOrderId(orderId);
         List<PricebookEntryWrapper> pricebookEntryWrappers = new List<PricebookEntryWrapper>();
         for (PricebookEntry pricebookEntry : pricebookEntries) {
@@ -21,6 +21,6 @@ public with sharing class AvailableProductsController {
             );
         }
         pricebookEntryWrappers.sort();
-        return pricebookEntryWrappers;
+        return JSONSerializer.serialize(pricebookEntryWrappers);
     }
 }
