@@ -14,4 +14,9 @@ public with sharing class OrderProductsController {
     public static List<OrderItem> getOrderProducts(Id orderId) {
         return OrderController.getOrderItemsByOrderId(orderId);
     }
+
+    @AuraEnabled(Cacheable=false)
+    public static Boolean activateOrder(Id orderId) {
+        return OrderController.activateOrder(orderId);
+    }
 }
