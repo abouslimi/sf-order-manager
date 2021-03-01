@@ -60,9 +60,14 @@ public with sharing class OrderRepository {
         req.setBody(content);
         req.setMethod('POST');
         req.setCompressed(false);
-        HttpResponse res = new Http().send(req);
-        System.debug(res);
-        return res;
+        try {
+            HttpResponse res = new Http().send(req);
+            System.debug(res);
+            return res;
+        } catch (CalloutException e) {
+            System.debug(e);
+            return null;
+        }
     }
 
     public static Decimal getOrderItemQuantity(Id orderItemId) {
