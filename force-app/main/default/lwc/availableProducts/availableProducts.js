@@ -5,7 +5,6 @@ import {
 } from 'lightning/uiRecordApi';
 import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
 import getPricebookEntries from '@salesforce/apex/AvailableProductsController.getPricebookEntriesByOrderId';
-import { refreshApex } from '@salesforce/apex';
 import pubsub from 'c/pubsub';
 
 const ORDER_FIELDS = [ORDER_STATUS_FIELD];
@@ -35,17 +34,32 @@ const PRICEBOOK_ENTRY_COLUMNS = [
 
 export default class AvailableProducts extends LightningElement {
     @api recordId;
-    pricebookEntryColumns = PRICEBOOK_ENTRY_COLUMNS;
     @wire(getRecord, { recordId: '$recordId', fields: ORDER_FIELDS })
     order;
 
-    @wire(getPricebookEntries, { orderId: '$recordId' })
-    pricebookEntries;
+    @wire(getPricebookEntries, { orderId: '$recordId', intOffset: 0 })
+    pricebookEntries(result) {
+        const { data, error } = result;
+        if (data) {
+            this.availableProducts = data;
+        } else {
+            console.error(error);
+        }
+    };
 
-    get getPricebookEntryData() {
-        if (this.pricebookEntries && Array.isArray(this.pricebookEntries.data)) {
+    availableProducts = [];
+    getAvailableProductsColumns = PRICEBOOK_ENTRY_COLUMNS;
+    enableAvailableProductsTableLoading = true;
+    loadMoreAvailableProductsStatus;
+
+    get isAvailableProductsTableLoading() {
+        return this.loadMoreAvailableProductsStatus === 'Loading';
+    }
+
+    get getAvailableProducts() {
+        if (this.order && this.order.data) {
             const orderStatus = getFieldValue(this.order.data, ORDER_STATUS_FIELD);
-            return this.pricebookEntries.data.map(e => {
+            return this.availableProducts.map(e => {
                 return {
                     ...e.pricebookEntry,
                     DisableAddButton: orderStatus === 'Activated',
@@ -56,13 +70,29 @@ export default class AvailableProducts extends LightningElement {
         }
     }
 
+    loadMoreAvailableProducts(event) {
+        this.loadMoreAvailableProductsStatus = 'Loading';
+        getPricebookEntries({ orderId: this.recordId, intOffset: this.availableProducts.length })
+            .then((data) => {
+                if (data) {
+                    if (data.length === 0) {
+                        this.enableAvailableProductsTableLoading = false;
+                        this.loadMoreAvailableProductsStatus = 'No more available products to load';
+                    } else {
+                        const currentData = this.availableProducts;
+                        const newData = currentData.concat(data);
+                        this.availableProducts = newData;
+                        this.loadMoreAvailableProductsStatus = '';
+                    }
+                }
+            });
+    }
+
     handleRowAction(event) {
         const product = event.detail.row;
         let payload = {
             "product": JSON.stringify(product)
         }
         pubsub.fire('ADD_ORDER_ITEM', payload);
-        return refreshApex(this.pricebookEntries).then(() => {
-        });
     }
 }

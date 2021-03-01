@@ -7,10 +7,11 @@ public with sharing class PricebookController {
      * @description
      * Get PriceBook Entries of Order's PriceBook
      * @param orderId
+     * @param intOffset
      *
      * @return List<PricebookEntry>
      */
-    public static List<PricebookEntry> getPricebookEntriesByOrderId(Id orderId) {
-        return PricebookRepository.getPricebookEntriesByOrderId(orderId);
+    public static List<PricebookEntry> getPricebookEntriesByOrderId(Id orderId, Integer intOffset) {
+        return PricebookRepository.getPricebookEntriesByOrderId(orderId, intOffset);
     }
 }

@@ -20,10 +20,11 @@ public with sharing class PricebookRepository {
      * @description
      * Get Entries of Order's PriceBook
      * @param orderId
+     * @param intOffset
      *
      * @return List of Price entries
      */
-    public static List<PricebookEntry> getPricebookEntriesByOrderId(Id orderId) {
+    public static List<PricebookEntry> getPricebookEntriesByOrderId(Id orderId, Integer intOffset) {
         Id priceBookId = PricebookRepository.getPricebookIdByOrderId(orderId);
         if (priceBookId == null) return new List<PricebookEntry>();
         return [
@@ -31,6 +32,8 @@ public with sharing class PricebookRepository {
                 FROM PricebookEntry
                 WHERE Pricebook2Id = :priceBookId AND IsActive = TRUE
                 ORDER BY Name
+                LIMIT 200
+                OFFSET :intOffset
         ];
     }
 }

@@ -1,15 +1,19 @@
 <template>
     <lightning-card  variant="Narrow"  title="Available Products" icon-name="standard:price_book_entries">
         <p class="slds-p-horizontal_small">
-            <template if:true={pricebookEntries.data}>
                 <lightning-datatable
-                        columns={pricebookEntryColumns}
-                        data={getPricebookEntryData}
+                        columns={getAvailableProductsColumns}
+                        data={getAvailableProducts}
                         hide-checkbox-column='true'
                         key-field="Product2Id"
+                        enable-infinite-loading={enableAvailableProductsTableLoading}
+                        is-loading={isAvailableProductsTableLoading}
+                        onloadmore={loadMoreAvailableProducts}
                         onrowaction={handleRowAction}
                 ></lightning-datatable>
-            </template>
+                <s class="slds-text-align_center">
+                    {loadMoreAvailableProductsStatus}
+                </s>
         </p>
     </lightning-card>
 </template>
