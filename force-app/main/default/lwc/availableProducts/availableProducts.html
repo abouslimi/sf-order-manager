@@ -1,19 +1,26 @@
 <template>
     <lightning-card  variant="Narrow"  title="Available Products" icon-name="standard:price_book_entries">
         <p class="slds-p-horizontal_small">
+            <template if:true={getOrderPricebookId}>
                 <lightning-datatable
-                        columns={getAvailableProductsColumns}
-                        data={getAvailableProducts}
-                        hide-checkbox-column='true'
-                        key-field="Product2Id"
-                        enable-infinite-loading={enableAvailableProductsTableLoading}
-                        is-loading={isAvailableProductsTableLoading}
-                        onloadmore={loadMoreAvailableProducts}
-                        onrowaction={handleRowAction}
+                    columns={getAvailableProductsColumns}
+                    data={getAvailableProducts}
+                    hide-checkbox-column='true'
+                    key-field="Product2Id"
+                    enable-infinite-loading={enableAvailableProductsTableLoading}
+                    is-loading={isAvailableProductsTableLoading}
+                    onloadmore={loadMoreAvailableProducts}
+                    onrowaction={handleRowAction}
                 ></lightning-datatable>
-                <span class="slds-text-align_center">
+                <div class="slds-text-align_center slds-text-body_small">
                     {loadMoreAvailableProductsStatus}
-                </span>
+                </div>
+            </template>
+            <template if:false={getOrderPricebookId}>
+                <div class="slds-text-align_center slds-text-title_caps">
+                    Order has no pricebook
+                </div>
+            </template>
         </p>
     </lightning-card>
 </template>

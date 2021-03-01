@@ -4,10 +4,11 @@ import {
     getFieldValue
 } from 'lightning/uiRecordApi';
 import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
+import ORDER_PRICEBOOK_ID_FIELD from '@salesforce/schema/Order.Pricebook2Id';
 import getPricebookEntries from '@salesforce/apex/AvailableProductsController.getPricebookEntriesByOrderId';
 import pubsub from 'c/pubsub';
 
-const ORDER_FIELDS = [ORDER_STATUS_FIELD];
+const ORDER_FIELDS = [ORDER_STATUS_FIELD, ORDER_PRICEBOOK_ID_FIELD];
 
 const PRICEBOOK_ENTRY_COLUMNS = [
     {
@@ -52,10 +53,6 @@ export default class AvailableProducts extends LightningElement {
     enableAvailableProductsTableLoading = true;
     loadMoreAvailableProductsStatus;
 
-    get isAvailableProductsTableLoading() {
-        return this.loadMoreAvailableProductsStatus === 'Loading';
-    }
-
     get getAvailableProducts() {
         if (this.order && this.order.data) {
             const orderStatus = getFieldValue(this.order.data, ORDER_STATUS_FIELD);
@@ -68,6 +65,14 @@ export default class AvailableProducts extends LightningElement {
         } else {
             return [];
         }
+    }
+
+    get getOrderPricebookId() {
+        return getFieldValue(this.order.data, ORDER_PRICEBOOK_ID_FIELD);
+    }
+
+    get isAvailableProductsTableLoading() {
+        return this.loadMoreAvailableProductsStatus === 'Loading';
     }
 
     loadMoreAvailableProducts(event) {
