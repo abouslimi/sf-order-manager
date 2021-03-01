@@ -1,3 +1,15 @@
 <template>
-    
+    <lightning-card  variant="Narrow"  title="Available Products" icon-name="standard:price_book_entries">
+        <p class="slds-p-horizontal_small">
+            <template if:true={pricebookEntries.data}>
+                <lightning-datatable
+                        columns={pricebookEntryColumns}
+                        data={getPricebookEntryData}
+                        hide-checkbox-column='true'
+                        key-field="Product2Id"
+                        onrowaction={handleRowAction}
+                ></lightning-datatable>
+            </template>
+        </p>
+    </lightning-card>
 </template>
