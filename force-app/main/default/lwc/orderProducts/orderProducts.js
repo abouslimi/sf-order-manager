@@ -86,6 +86,7 @@ export default class OrderProducts extends LightningElement {
             .then(() => {
                 this.displayToast('Order item updated');
                 return refreshApex(this.orderProducts).then(() => {
+                    updateRecord({ fields: { Id: this.recordId } });
                 });
             }).catch(error => {
                 console.error(error);
@@ -102,6 +103,7 @@ export default class OrderProducts extends LightningElement {
             .then(() => {
                 this.displayToast('Product added');
                 return refreshApex(this.orderProducts).then(() => {
+                    updateRecord({ fields: { Id: this.recordId } });
                 });
             }).catch(error => {
                 console.error(error);
