@@ -25,18 +25,30 @@ const ORDER_PRODUCT_COLUMNS = [
 
 export default class OrderProducts extends LightningElement {
     @api recordId;
+    orderItems = [];
+    refreshOrderProducts;
     orderProductColumns = ORDER_PRODUCT_COLUMNS;
+    enableOrderItemsTableLoading = true;
+    loadMoreOrderItemsStatus;
 
     @wire(getRecord, { recordId: '$recordId', fields: ORDER_FIELDS })
     order;
 
-    @wire(getOrderProducts, { orderId: '$recordId' })
-    orderProducts;
+    @wire(getOrderProducts, { orderId: '$recordId', intOffset: 0 })
+    orderProducts(result) {
+        this.refreshOrderProducts = result;
+        const { data, error } = result;
+        if (data) {
+            this.orderItems = data;
+        } else if (error) {
+            console.error(error);
+        }
+    };
 
     get getOrderProductsData() {
-        if (this.orderProducts && Array.isArray(this.orderProducts.data)) {
-            return this.orderProducts.data.map(p => {
-                return flatten(p);
+        if (this.orderItems) {
+            return this.orderItems.map(item => {
+                return flatten(item);
             });
         } else {
             return [];
@@ -47,23 +59,45 @@ export default class OrderProducts extends LightningElement {
         return getFieldValue(this.order.data, ORDER_STATUS_FIELD) === "Activated";
     }
 
+    get isOrderItemsTableLoading() {
+        return this.loadMoreOrderItemsStatus === 'Loading';
+    }
+
     connectedCallback() {
         this.register();
     }
 
+    loadMoreOrderItems(event) {
+        this.loadMoreOrderItemsStatus = 'Loading';
+        getOrderProducts({ orderId: this.recordId, intOffset: this.orderItems.length })
+            .then((data) => {
+                if (data) {
+                    if (data.length === 0) {
+                        this.enableOrderItemsTableLoading = false;
+                        this.loadMoreOrderItemsStatus = 'No more order items to load';
+                    } else {
+                        const currentData = this.orderItems;
+                        const newData = currentData.concat(data);
+                        this.orderItems = newData;
+                        this.loadMoreOrderItemsStatus = '';
+                    }
+                }
+            });
+    }
+
     activateOrder() {
-        activateOrder({orderId: this.recordId})
-        .then((isOrderActivated) => {
-            if (isOrderActivated) {
-                updateRecord({ fields: { Id: this.recordId } });
-                this.displayToast('Order activated');
-            } else {
-                this.displayToast('Order not activated', null, 'warning');
-            }
-        }).catch(error => {
-            console.error(error);
-            this.displayToast('ERROR', error.body.message, 'error');
-        });
+        activateOrder({ orderId: this.recordId })
+            .then((isOrderActivated) => {
+                if (isOrderActivated) {
+                    updateRecord({ fields: { Id: this.recordId } });
+                    this.displayToast('Order activated');
+                } else {
+                    this.displayToast('Order not activated', null, 'warning');
+                }
+            }).catch(error => {
+                console.error(error);
+                this.displayToast('ERROR', error.body.message, 'error');
+            });
     }
 
     register() {
@@ -72,43 +106,43 @@ export default class OrderProducts extends LightningElement {
 
     handleAddOrderItemEvent(event) {
         const product = JSON.parse(event.product);
-        for (const orderProduct of this.orderProducts.data) {
-            if (orderProduct.Product2Id === product.Product2Id) {
-                return this.handleOrderItem(product, orderProduct);
+        for (const orderItem of this.orderItems) {
+            if (orderItem.Product2Id === product.Product2Id) {
+                return this.handleOrderItemAddition(product, orderItem);
             }
         }
-        return this.handleOrderItem(product);
+        return this.handleOrderItemAddition(product);
     }
 
-    handleOrderItem(product, oldRecord = {}) {
-        if (oldRecord.Id) {
-            incrementOrderItemQuantity({ orderItemId: oldRecord.Id})
-            .then(() => {
-                this.displayToast('Order item updated');
-                return refreshApex(this.orderProducts).then(() => {
-                    updateRecord({ fields: { Id: this.recordId } });
+    handleOrderItemAddition(product, orderItemRecord = {}) {
+        if (orderItemRecord.Id) {
+            incrementOrderItemQuantity({ orderItemId: orderItemRecord.Id })
+                .then(() => {
+                    this.displayToast('Order item updated');
+                    return refreshApex(this.refreshOrderProducts).then(() => {
+                        updateRecord({ fields: { Id: this.recordId } });
+                    });
+                }).catch(error => {
+                    console.error(error);
+                    this.displayToast('ERROR', error.body.message, 'error');
                 });
-            }).catch(error => {
-                console.error(error);
-                this.displayToast('ERROR', error.body.message, 'error');
-            });
 
         } else {
-            createOrderItem({ 
+            createOrderItem({
                 orderId: this.recordId,
                 productId: product.Id,
                 unitPrice: product.UnitPrice,
                 quantity: 1
             })
-            .then(() => {
-                this.displayToast('Product added');
-                return refreshApex(this.orderProducts).then(() => {
-                    updateRecord({ fields: { Id: this.recordId } });
+                .then(() => {
+                    this.displayToast('Product added');
+                    return refreshApex(this.refreshOrderProducts).then(() => {
+                        updateRecord({ fields: { Id: this.recordId } });
+                    });
+                }).catch(error => {
+                    console.error(error);
+                    this.displayToast('ERROR', error.body.message, 'error');
                 });
-            }).catch(error => {
-                console.error(error);
-                this.displayToast('ERROR', error.body.message, 'error');
-            });
         }
     }
 

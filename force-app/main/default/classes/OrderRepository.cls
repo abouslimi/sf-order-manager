@@ -6,15 +6,18 @@ public with sharing class OrderRepository {
     /**
      * @description Get items of an order
      * @param orderId
+     * @param intOffset
      *
      * @return List of order items
      */
-    public static List<OrderItem> getOrderItemsByOrderId(Id orderId) {
+    public static List<OrderItem> getOrderItemsByOrderId(Id orderId, Integer intOffset) {
         return [
                 SELECT Id, Product2Id, Product2.Name, UnitPrice, Quantity, TotalPrice
                 FROM OrderItem
                 WHERE OrderId = :orderId
                 ORDER BY CreatedDate DESC
+                LIMIT 200
+                OFFSET :intOffset
         ];
     }
 

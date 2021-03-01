@@ -7,12 +7,13 @@ public with sharing class OrderProductsController {
     /**
      * @description Get items of an order
      * @param orderId
+     * @param intOffset
      *
      * @return List of order items
      */
     @AuraEnabled(Cacheable=true)
-    public static List<OrderItem> getOrderProducts(Id orderId) {
-        return OrderController.getOrderItemsByOrderId(orderId);
+    public static List<OrderItem> getOrderProducts(Id orderId, Integer intOffset) {
+        return OrderController.getOrderItemsByOrderId(orderId, intOffset);
     }
 
     @AuraEnabled(Cacheable=false)

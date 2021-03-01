@@ -6,11 +6,12 @@ public with sharing class OrderController {
     /**
      * @description Get items of an order
      * @param orderId
+     * @param intOffset
      *
      * @return List of order items
      */
-    public static List<OrderItem> getOrderItemsByOrderId(Id orderId) {
-        return OrderRepository.getOrderItemsByOrderId(orderId);
+    public static List<OrderItem> getOrderItemsByOrderId(Id orderId, Integer intOffset) {
+        return OrderRepository.getOrderItemsByOrderId(orderId, intOffset);
     }
 
     public static Boolean activateOrder(Id orderId) {
