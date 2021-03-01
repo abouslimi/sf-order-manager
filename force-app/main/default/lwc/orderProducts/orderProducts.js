@@ -10,11 +10,12 @@ import {
     updateRecord
 } from 'lightning/uiRecordApi';
 import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
+import ORDER_PRICEBOOK_ID_FIELD from '@salesforce/schema/Order.Pricebook2Id';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import pubsub from 'c/pubsub';
 import flatten from 'c/flatten';
 
-const ORDER_FIELDS = [ORDER_STATUS_FIELD];
+const ORDER_FIELDS = [ORDER_STATUS_FIELD, ORDER_PRICEBOOK_ID_FIELD];
 
 const ORDER_PRODUCT_COLUMNS = [
     { label: 'Name', fieldName: 'Product2.Name', type: 'text' },
@@ -130,6 +131,7 @@ export default class OrderProducts extends LightningElement {
         } else {
             createOrderItem({
                 orderId: this.recordId,
+                pricebookEntryId: getFieldValue(this.order.data, ORDER_PRICEBOOK_ID_FIELD),
                 productId: product.Id,
                 unitPrice: product.UnitPrice,
                 quantity: 1
