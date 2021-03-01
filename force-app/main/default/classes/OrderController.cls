@@ -29,4 +29,29 @@ public with sharing class OrderController {
             return false;
         }
     }
+
+    public static OrderItem createOrderItem(Id orderId, Id productId, Decimal unitPrice, Decimal quantity) {
+        try {
+            OrderItem orderItem = new OrderItem(OrderId = orderId, Product2Id = productId, UnitPrice = unitPrice, Quantity = quantity);
+            insert orderItem;
+            return orderItem;
+        } catch (System.DmlException e) {
+            System.debug('The following exception has occurred: ' + e.getMessage());
+            return null;
+        }
+    }
+
+    public static OrderItem incrementOrderItemQuantity(Id orderItemId) {
+        try {
+            OrderItem orderItem = new OrderItem(
+                    Id=orderItemId,
+                    Quantity=OrderRepository.getOrderItemQuantity(orderItemId) + 1
+            );
+            update orderItem;
+            return orderItem;
+        } catch (System.DmlException e) {
+            System.debug('The following exception has occurred: ' + e.getMessage());
+            return null;
+        }
+    }
 }

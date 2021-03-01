@@ -1,19 +1,15 @@
 import { LightningElement, api, wire } from 'lwc';
-import activateOrder from '@salesforce/apex/OrderProductsController.activateOrder';
 import getOrderProducts from '@salesforce/apex/OrderProductsController.getOrderProducts';
+import activateOrder from '@salesforce/apex/OrderProductsController.activateOrder';
+import createOrderItem from '@salesforce/apex/OrderProductsController.createOrderItem';
+import incrementOrderItemQuantity from '@salesforce/apex/OrderProductsController.incrementOrderItemQuantity';
 import { refreshApex } from '@salesforce/apex';
 import {
     getRecord,
     getFieldValue,
-    createRecord,
     updateRecord
 } from 'lightning/uiRecordApi';
 import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
-import ORDER_ITEM_ID_FIELD from '@salesforce/schema/OrderItem.Id';
-import ORDER_ITEM_ORDER_ID_FIELD from '@salesforce/schema/OrderItem.OrderId';
-import ORDER_ITEM_PRODUCT_ID_FIELD from '@salesforce/schema/OrderItem.Product2Id';
-import ORDER_ITEM_UNIT_PRICE_FIELD from '@salesforce/schema/OrderItem.UnitPrice';
-import ORDER_ITEM_QUANTITY_FIELD from '@salesforce/schema/OrderItem.Quantity';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import pubsub from 'c/pubsub';
 import flatten from 'c/flatten';
@@ -78,41 +74,40 @@ export default class OrderProducts extends LightningElement {
         const product = JSON.parse(event.product);
         for (const orderProduct of this.orderProducts.data) {
             if (orderProduct.Product2Id === product.Product2Id) {
-                return this.addOrderItem(product, orderProduct);
+                return this.handleOrderItem(product, orderProduct);
             }
         }
-        return this.addOrderItem(product);
+        return this.handleOrderItem(product);
     }
 
-    addOrderItem(product, oldRecord = {}) {
-        let recordAction;
-        const recordPayload = {};
-        const fields = {};
-        let successMessage;
+    handleOrderItem(product, oldRecord = {}) {
         if (oldRecord.Id) {
-            recordAction = updateRecord;
-            fields[ORDER_ITEM_ID_FIELD.fieldApiName] = oldRecord.Id;
-            fields[ORDER_ITEM_QUANTITY_FIELD.fieldApiName] = oldRecord.Quantity + 1;
-            successMessage = 'Order item updated';
-        } else {
-            recordAction = createRecord;
-            recordPayload.apiName = 'OrderItem';
-            fields[ORDER_ITEM_ORDER_ID_FIELD.fieldApiName] = this.recordId;
-            fields[ORDER_ITEM_PRODUCT_ID_FIELD.fieldApiName] = product.Id;
-            fields[ORDER_ITEM_UNIT_PRICE_FIELD.fieldApiName] = product.UnitPrice;
-            fields[ORDER_ITEM_QUANTITY_FIELD.fieldApiName] = 1;
-            successMessage = 'Product added';
-        }
-        recordPayload.fields = fields;
-        recordAction(recordPayload)
+            incrementOrderItemQuantity({ orderItemId: oldRecord.Id})
             .then(() => {
-                this.displayToast(successMessage);
+                this.displayToast('Order item updated');
                 return refreshApex(this.orderProducts).then(() => {
                 });
             }).catch(error => {
                 console.error(error);
                 this.displayToast('ERROR', error.body.message, 'error');
             });
+
+        } else {
+            createOrderItem({ 
+                orderId: this.recordId,
+                productId: product.Id,
+                unitPrice: product.UnitPrice,
+                quantity: 1
+            })
+            .then(() => {
+                this.displayToast('Product added');
+                return refreshApex(this.orderProducts).then(() => {
+                });
+            }).catch(error => {
+                console.error(error);
+                this.displayToast('ERROR', error.body.message, 'error');
+            });
+        }
     }
 
     displayToast(title, message, variant = 'success') {

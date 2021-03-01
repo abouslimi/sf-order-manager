@@ -19,4 +19,14 @@ public with sharing class OrderProductsController {
     public static Boolean activateOrder(Id orderId) {
         return OrderController.activateOrder(orderId);
     }
+
+    @AuraEnabled(Cacheable=false)
+    public static OrderItem createOrderItem(Id orderId, Id productId, Decimal unitPrice, Decimal quantity) {
+        return OrderController.createOrderItem(orderId, productId, unitPrice, quantity);
+    }
+
+    @AuraEnabled(Cacheable=false)
+    public static OrderItem incrementOrderItemQuantity(Id orderItemId) {
+        return OrderController.incrementOrderItemQuantity(orderItemId);
+    }
 }

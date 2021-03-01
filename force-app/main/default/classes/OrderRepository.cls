@@ -61,4 +61,10 @@ public with sharing class OrderRepository {
         System.debug(res);
         return res;
     }
+
+    public static Decimal getOrderItemQuantity(Id orderItemId) {
+        List<OrderItem> orderItems = [SELECT Quantity FROM OrderItem WHERE Id =: orderItemId];
+        if (orderItems.isEmpty()) return null;
+        return  orderItems[0].Quantity;
+    }
 }
