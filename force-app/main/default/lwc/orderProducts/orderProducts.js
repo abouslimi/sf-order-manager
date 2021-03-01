@@ -1,4 +1,5 @@
 import { LightningElement, api, wire } from 'lwc';
+import activateOrder from '@salesforce/apex/OrderProductsController.activateOrder';
 import getOrderProducts from '@salesforce/apex/OrderProductsController.getOrderProducts';
 import { refreshApex } from '@salesforce/apex';
 import {
@@ -7,7 +8,6 @@ import {
     createRecord,
     updateRecord
 } from 'lightning/uiRecordApi';
-import ORDER_ID_FIELD from '@salesforce/schema/Order.Id';
 import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
 import ORDER_ITEM_ID_FIELD from '@salesforce/schema/OrderItem.Id';
 import ORDER_ITEM_ORDER_ID_FIELD from '@salesforce/schema/OrderItem.OrderId';
@@ -56,16 +56,18 @@ export default class OrderProducts extends LightningElement {
     }
 
     activateOrder() {
-        const fields = {};
-        fields[ORDER_ID_FIELD.fieldApiName] = this.recordId;
-        fields[ORDER_STATUS_FIELD.fieldApiName] = 'Activated';
-        updateRecord({ fields })
-            .then(() => {
+        activateOrder({orderId: this.recordId})
+        .then((isOrderActivated) => {
+            if (isOrderActivated) {
+                updateRecord({ fields: { Id: this.recordId } });
                 this.displayToast('Order activated');
-            }).catch(error => {
-                console.error(error);
-                this.displayToast('ERROR', error.body.message, 'error');
-            });
+            } else {
+                this.displayToast('Order not activated', null, 'warning');
+            }
+        }).catch(error => {
+            console.error(error);
+            this.displayToast('ERROR', error.body.message, 'error');
+        });
     }
 
     register() {
