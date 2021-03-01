@@ -17,4 +17,9 @@ User can add products to order while not leaving record detail page.
 
 # Notes
 
-- Another `Pricebook` component has to be implemented to set ordered pricebook
+- `Pricebook` component has to be implemented to select order pricebook
+- You can generate test data using [testData script](scripts/apex/testData.apex) script
+
+![alt text](lwc-components.png "2 LWC components")
+
+[Video](https://drive.google.com/file/d/1T2qjw1CiisD88Y5Rc6y7bISHwLpueq6F/view)
