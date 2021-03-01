@@ -39,10 +39,10 @@ export default class AvailableProducts extends LightningElement {
 
     @wire(getPricebookEntries, { orderId: '$recordId', intOffset: 0 })
     pricebookEntries(result) {
-        const { data, error } = result;
+        const { error, data } = result;
         if (data) {
             this.availableProducts = data;
-        } else {
+        } else if (error) {
             console.error(error);
         }
     };
