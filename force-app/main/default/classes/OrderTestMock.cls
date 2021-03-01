@@ -6,6 +6,7 @@
 public class OrderTestMock {
     public static final String TEST_ACCOUNT_NUMBER = 'TEST001';
     public static final Integer TEST_GENERATED_PRODUCTS_COUNT = 300;
+
     public static void createOrderMockData() {
         // Create customer account
         Account account = new Account(
