@@ -128,7 +128,8 @@ export default class OrderProducts extends LightningElement {
                     this.displayToast('ERROR', error.body.message, 'error');
                 });
 
-        } else {
+        } else if (product) {
+            console.log('createOrderItem');
             createOrderItem({
                 orderId: this.recordId,
                 pricebookEntryId: getFieldValue(this.order.data, ORDER_PRICEBOOK_ID_FIELD),
