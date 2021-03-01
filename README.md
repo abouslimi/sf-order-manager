@@ -1,18 +1,20 @@
-# Salesforce DX Project: Next Steps
+# Salesforce Order Manager (SFDX)
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+User can add products to order while not leaving record detail page.
 
-## How Do You Plan to Deploy Your Changes?
+## LWC
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+2 LWC independant components on order record page:
 
-## Configure Your Salesforce DX Project
+- `Available Products`
+    - It displays available products suitable for Order based on Order’s price book
+    - User can add a product from the list to the order
+    - By adding an existing product in order, It increments order item quantity by 1
+- `Order Products`
+    - It displays products added to the current order
+    - The activation button sends request to an external system via HTTP (`https://sf-order-manager.requestcatcher.com`) for order confirmation
+- Both components can handle more than 200 records
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+# Notes
 
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+- Another `Pricebook` component has to be implemented to set ordered pricebook
