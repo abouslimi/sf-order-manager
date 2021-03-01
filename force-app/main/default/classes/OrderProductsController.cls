@@ -22,8 +22,8 @@ public with sharing class OrderProductsController {
     }
 
     @AuraEnabled(Cacheable=false)
-    public static OrderItem createOrderItem(Id orderId, Id productId, Decimal unitPrice, Decimal quantity) {
-        return OrderController.createOrderItem(orderId, productId, unitPrice, quantity);
+    public static OrderItem createOrderItem(Id orderId, Id pricebookEntryId, Id productId, Decimal unitPrice, Decimal quantity) {
+        return OrderController.createOrderItem(orderId, pricebookEntryId, productId, unitPrice, quantity);
     }
 
     @AuraEnabled(Cacheable=false)

@@ -31,9 +31,15 @@ public with sharing class OrderController {
         }
     }
 
-    public static OrderItem createOrderItem(Id orderId, Id productId, Decimal unitPrice, Decimal quantity) {
+    public static OrderItem createOrderItem(Id orderId, Id pricebookEntryId, Id productId, Decimal unitPrice, Decimal quantity) {
         try {
-            OrderItem orderItem = new OrderItem(OrderId = orderId, Product2Id = productId, UnitPrice = unitPrice, Quantity = quantity);
+            OrderItem orderItem = new OrderItem(
+                    OrderId = orderId,
+                    PricebookEntryId = pricebookEntryId,
+                    Product2Id = productId,
+                    UnitPrice = unitPrice,
+                    Quantity = quantity
+            );
             insert orderItem;
             return orderItem;
         } catch (System.DmlException e) {
