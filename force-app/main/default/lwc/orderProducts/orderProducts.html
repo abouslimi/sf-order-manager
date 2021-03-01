@@ -1,0 +1,15 @@
+<template>
+    <lightning-card  variant="Narrow"  title="Order Products" icon-name="standard:orders">
+        <lightning-button label="Activate" disabled={isOrderActivated} onclick={activateOrder} slot="actions"></lightning-button>
+        <p class="slds-p-horizontal_small">
+            <template if:true={orderProducts.data}>
+                <lightning-datatable
+                        columns={orderProductColumns}
+                        data={getOrderProductsData}
+                        hide-checkbox-column='true'
+                        key-field="Id"
+                ></lightning-datatable>
+            </template>
+        </p>
+    </lightning-card>
+</template>
